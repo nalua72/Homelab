@@ -25,14 +25,13 @@ services:
     environment:
       - VPN_SERVICE_PROVIDER=protonvpn
       - VPN_TYPE=openvpn
-      - OPENVPN_USER=TU_USUARIO
-      - OPENVPN_PASSWORD=TU_PASSWORD
+      - OPENVPN_USER=${OPENVPN_USER}
+      - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
       - SERVER_COUNTRIES=Netherlands
       - FIREWALL=on
       - TZ=Europe/Madrid
 
     restart: unless-stopped
-
 
   qbittorrent:
     image: linuxserver/qbittorrent
@@ -51,7 +50,6 @@ services:
 
     restart: unless-stopped
 
-
   flood:
     image: jesec/flood
     container_name: flood
@@ -64,7 +62,6 @@ services:
       - ./flood/config:/config
 
     restart: unless-stopped
-
 
   prowlarr:
     image: linuxserver/prowlarr
@@ -80,7 +77,6 @@ services:
       - ./prowlarr/config:/config
 
     restart: unless-stopped
-
 
   sonarr:
     image: linuxserver/sonarr
@@ -99,7 +95,6 @@ services:
 
     restart: unless-stopped
 
-
   radarr:
     image: linuxserver/radarr
     container_name: radarr
@@ -116,7 +111,6 @@ services:
       - ./media/movies:/movies
 
     restart: unless-stopped
-
 
   jellyfin:
     image: linuxserver/jellyfin
