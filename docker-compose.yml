@@ -1,7 +1,10 @@
 name: homelab
 
+version: "3.9"
+
 services:
 
+  # VPN Container
   gluetun:
     image: qmcgaw/gluetun:latest
     container_name: gluetun
@@ -11,11 +14,10 @@ services:
       - /dev/net/tun:/dev/net/tun
 
     ports:
-      - 8080:8080
-      - 8989:8989
-      - 7878:7878
-      - 9696:9696
-      - 8096:8096
+      - 8080:8080 # solo si necesitas WebUI de gluetun
+      - 8989:8989 # Sonarr
+      - 7878:7878 # Radarr
+      - 9696:9696 # Prowlarr
 
     volumes:
       - ${HOME}/homelab/gluetun:/gluetun
@@ -31,8 +33,10 @@ services:
 
     restart: unless-stopped
 
+  # qBittorrent (pasa por VPN)
   qbittorrent:
     image: linuxserver/qbittorrent:latest
+    container_name: qbittorrent
     network_mode: service:gluetun
 
     environment:
@@ -47,8 +51,10 @@ services:
 
     restart: unless-stopped
 
+  # Prowlarr (pasa por VPN)
   prowlarr:
     image: linuxserver/prowlarr:latest
+    container_name: prowlarr
     network_mode: service:gluetun
 
     environment:
@@ -61,8 +67,10 @@ services:
 
     restart: unless-stopped
 
+  # Sonarr (pasa por VPN)
   sonarr:
     image: linuxserver/sonarr:latest
+    container_name: sonarr
     network_mode: service:gluetun
 
     environment:
@@ -77,8 +85,10 @@ services:
 
     restart: unless-stopped
 
+  # Radarr (pasa por VPN)
   radarr:
     image: linuxserver/radarr:latest
+    container_name: radarr
     network_mode: service:gluetun
 
     environment:
@@ -93,11 +103,13 @@ services:
 
     restart: unless-stopped
 
+  # Jellyfin (fuera de VPN, expone puertos al host)
   jellyfin:
     image: linuxserver/jellyfin:latest
+    container_name: jellyfin
 
     ports:
-      - 8096:8096
+      - 8096:8096 # puerto host → contenedor
 
     environment:
       - PUID=${PUID}
