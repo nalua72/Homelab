@@ -1,132 +1,112 @@
-version: "3.9"
+name: homelab
 
 services:
 
   gluetun:
     image: qmcgaw/gluetun:latest
     container_name: gluetun
-
     cap_add:
       - NET_ADMIN
-
     devices:
       - /dev/net/tun:/dev/net/tun
 
     ports:
       - 8080:8080
-      - 3000:3000
-      - 9696:9696
       - 8989:8989
       - 7878:7878
+      - 9696:9696
+      - 8096:8096
 
     volumes:
-      - ./gluetun:/gluetun
+      - ${HOME}/homelab/gluetun:/gluetun
 
     environment:
       - VPN_SERVICE_PROVIDER=protonvpn
       - VPN_TYPE=openvpn
       - OPENVPN_USER=${OPENVPN_USER}
       - OPENVPN_PASSWORD=${OPENVPN_PASSWORD}
-      - SERVER_COUNTRIES=Netherlands
+      - SERVER_COUNTRIES=${VPN_COUNTRY}
       - FIREWALL=on
-      - TZ=Europe/Madrid
+      - TZ=${TZ}
 
     restart: unless-stopped
 
   qbittorrent:
-    image: linuxserver/qbittorrent
-    container_name: qbittorrent
+    image: linuxserver/qbittorrent:latest
     network_mode: service:gluetun
 
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
       - WEBUI_PORT=8080
 
     volumes:
-      - ./qbittorrent/config:/config
-      - ./downloads:/downloads
-
-    restart: unless-stopped
-
-  flood:
-    image: jesec/flood
-    container_name: flood
-    network_mode: service:gluetun
-
-    environment:
-      - HOME=/config
-
-    volumes:
-      - ./flood/config:/config
+      - ${HOME}/homelab/qbittorrent/config:/config
+      - ${HOME}/homelab/downloads:/downloads
 
     restart: unless-stopped
 
   prowlarr:
-    image: linuxserver/prowlarr
-    container_name: prowlarr
+    image: linuxserver/prowlarr:latest
     network_mode: service:gluetun
 
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
 
     volumes:
-      - ./prowlarr/config:/config
+      - ${HOME}/homelab/prowlarr/config:/config
 
     restart: unless-stopped
 
   sonarr:
-    image: linuxserver/sonarr
-    container_name: sonarr
+    image: linuxserver/sonarr:latest
     network_mode: service:gluetun
 
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
 
     volumes:
-      - ./sonarr/config:/config
-      - ./downloads:/downloads
-      - ./media/series:/series
+      - ${HOME}/homelab/sonarr/config:/config
+      - ${HOME}/homelab/downloads:/downloads
+      - ${HOME}/homelab/media/series:/series
 
     restart: unless-stopped
 
   radarr:
-    image: linuxserver/radarr
-    container_name: radarr
+    image: linuxserver/radarr:latest
     network_mode: service:gluetun
 
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
 
     volumes:
-      - ./radarr/config:/config
-      - ./downloads:/downloads
-      - ./media/movies:/movies
+      - ${HOME}/homelab/radarr/config:/config
+      - ${HOME}/homelab/downloads:/downloads
+      - ${HOME}/homelab/media/movies:/movies
 
     restart: unless-stopped
 
   jellyfin:
-    image: linuxserver/jellyfin
-    container_name: jellyfin
+    image: linuxserver/jellyfin:latest
 
     ports:
       - 8096:8096
 
     environment:
-      - PUID=1000
-      - PGID=1000
-      - TZ=Europe/Madrid
+      - PUID=${PUID}
+      - PGID=${PGID}
+      - TZ=${TZ}
 
     volumes:
-      - ./jellyfin/config:/config
-      - ./jellyfin/cache:/cache
-      - ./media:/media
+      - ${HOME}/homelab/jellyfin/config:/config
+      - ${HOME}/homelab/jellyfin/cache:/cache
+      - ${HOME}/homelab/media:/media
 
     restart: unless-stopped
